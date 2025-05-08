@@ -4,16 +4,27 @@ from typing import List, Dict, Tuple
 
 @dataclass
 class Riesgo:
+    """Clase que representa un riesgo en un proyecto Scrum.
+    Contiene el nombre, probabilidad de ocurrencia e impacto del riesgo.
+    """
     nombre: str
-    probabilidad: int
-    impacto: int
+    probabilidad: int  # Valor entre 1-5 (1=muy baja, 5=muy alta)
+    impacto: int       # Valor entre 1-5 (1=muy bajo, 5=muy alto)
     
     @property
     def prioridad(self) -> int:
+        """Calcula la prioridad del riesgo como producto de probabilidad e impacto.
+        Retorna un valor entre 1-25.
+        """
         return self.probabilidad * self.impacto
     
     @property
     def nivel_prioridad(self) -> str:
+        """Clasifica el riesgo en niveles de prioridad según su valor calculado:
+        - Baja (1-6)
+        - Media (7-14)
+        - Alta (15-25)
+        """
         if 1 <= self.prioridad <= 6:
             return "Baja"
         elif 7 <= self.prioridad <= 14:
@@ -24,8 +35,15 @@ class Riesgo:
             return "Desconocida"
 
 class MitigacionStrategy:
+    """Clase que implementa el patrón Strategy para generar estrategias de mitigación
+    personalizadas según el tipo de riesgo y su nivel de prioridad.
+    """
+    
     @staticmethod
     def generar_mitigacion(riesgo: Riesgo) -> str:
+        """Genera una estrategia de mitigación basada en el tipo de riesgo y prioridad
+        """
+        # Diccionario con estrategias base para cada tipo de riesgo
         estrategias = {
             "Estimaciones de tiempo poco realistas": 
                 "Utilizar técnicas de estimación como Planning Poker e implementar revisiones periódicas de estimaciones.",
@@ -49,10 +67,10 @@ class MitigacionStrategy:
                 "Involucrar al cliente en reuniones clave. Realizar workshops para co-creación de historias."
         }
         
-        # Estrategia base para el riesgo
+        # Obtiene estrategia base o una por defecto si no existe
         estrategia_base = estrategias.get(riesgo.nombre, "Revisar procesos y realizar un análisis de causa raíz.")
         
-        # Ajustar estrategia según nivel de prioridad
+        # Ajusta estrategia según el nivel de prioridad
         if riesgo.nivel_prioridad == "Alta":
             return f"ACCION INMEDIATA REQUERIDA: {estrategia_base} Asignar recursos adicionales y monitorear diariamente."
         elif riesgo.nivel_prioridad == "Media":
@@ -61,15 +79,20 @@ class MitigacionStrategy:
             return f"Acciones preventivas: {estrategia_base} Monitorear periódicamente."
 
 class GestorRiesgos:
+    """Clase principal que gestiona la simulación de riesgos y sus operaciones."""
+        
     def __init__(self, riesgos: List[Riesgo]):
+        """Inicializa el gestor con una lista de riesgos posibles."""
         self.riesgos = riesgos
         self.mitigacion_strategy = MitigacionStrategy()
     
     def seleccionar_riesgo_aleatorio(self) -> Riesgo:
+        """Selecciona un riesgo aleatorio usando su probabilidad."""
         pesos = [riesgo.probabilidad for riesgo in self.riesgos]
         return random.choices(self.riesgos, weights=pesos, k=1)[0]
     
     def simular_sprint(self, num_sprints: int = 1) -> List[Dict]:
+        """Simula uno o múltiples sprints y genera los riesgos asociados."""
         resultados = []
         for _ in range(num_sprints):
             riesgo = self.seleccionar_riesgo_aleatorio()
@@ -85,17 +108,23 @@ class GestorRiesgos:
         return resultados
     
     def obtener_riesgo_mas_prioritario(self) -> Riesgo:
+        """Obtiene el riesgo con mayor prioridad de la lista."""
         return max(self.riesgos, key=lambda r: r.prioridad)
     
     def obtener_todos_riesgos_ordenados(self) -> List[Riesgo]:
+        """Devuelve todos los riesgos ordenados por prioridad."""
         return sorted(self.riesgos, key=lambda r: r.prioridad, reverse=True)
     
     def obtener_riesgos_por_nivel(self, nivel: str) -> List[Riesgo]:
+        """Muestra riesgos por nivel de prioridad."""
         return [r for r in self.riesgos if r.nivel_prioridad == nivel]
 
 class ReporteRiesgos:
+    """Clase que genera reportes de riesgos."""
+    
     @staticmethod
     def generar_reporte(resultados: List[Dict]) -> str:
+        """Genera un reporte de los resultados de la simulación."""
         reporte = "=== Reporte de Riesgos en Sprint ===\n\n"
         for i, resultado in enumerate(resultados, 1):
             reporte += (
@@ -110,6 +139,7 @@ class ReporteRiesgos:
     
     @staticmethod
     def generar_reporte_prioritario(riesgo: Riesgo, mitigacion: str) -> str:
+        """Genera un reporte para el riesgo con mayor prioridad."""
         return (
             "=== Riesgo más prioritario ===\n"
             f"Nombre: {riesgo.nombre}\n"
@@ -120,6 +150,7 @@ class ReporteRiesgos:
     
     @staticmethod
     def generar_reporte_por_nivel(riesgos: List[Tuple[Riesgo, str]], nivel: str) -> str:
+        """Filtra y genera un reporte de riesgos por nivel de prioridad"""
         reporte = f"=== Riesgos con Prioridad {nivel} ===\n\n"
         for i, (riesgo, mitigacion) in enumerate(riesgos, 1):
             reporte += (
@@ -132,6 +163,7 @@ class ReporteRiesgos:
         return reporte
 
 def cargar_riesgos() -> List[Riesgo]:
+    """Carga la lista de riesgos predefinida."""
     return [
         Riesgo("Estimaciones de tiempo poco realistas", 3, 2),
         Riesgo("Falta de habilidades técnicas en el equipo", 2, 3),
@@ -146,6 +178,7 @@ def cargar_riesgos() -> List[Riesgo]:
     ]
 
 def main():
+    """Función principal que maneja el flujo del programa y la interfaz de usuario."""
     riesgos = cargar_riesgos()
     gestor = GestorRiesgos(riesgos)
     reporte = ReporteRiesgos()
@@ -153,6 +186,7 @@ def main():
     print("=== Simulador de Riesgos en Sprints Scrum ===")
     
     while True:
+        # Menú de opciones
         print("\nOpciones:")
         print("1. Simular un sprint")
         print("2. Simular múltiples sprints")
@@ -163,6 +197,7 @@ def main():
         
         opcion = input("Seleccione una opción: ")
         
+        # Lógica de manejo de opciones
         if opcion == "1":
             resultados = gestor.simular_sprint()
             print("\n" + reporte.generar_reporte(resultados))
