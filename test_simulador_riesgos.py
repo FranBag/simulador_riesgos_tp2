@@ -1,5 +1,5 @@
 import pytest
-from simulador_riegos import Riesgo, MitigacionStrategy, GestorRiesgos, cargar_riesgos
+from simulador_riesgos import Riesgo, MitigacionStrategy, GestorRiesgos, cargar_riesgos
 
 def test_prioridad_calculo_correcto():
     riesgo = Riesgo("Test", probabilidad=4, impacto=5)
