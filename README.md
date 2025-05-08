@@ -19,6 +19,8 @@ Desarrollo de un simulador en Python que genera riesgos aleatorios durante sprin
 
 ---
 
+### **Video Demostrativo** 
+- [Link a video demostrativo](https://drive.google.com/file/d/1HAyCrsB-2cw-1tT2KqNw41PDZzIJRFpu/view?usp=sharing)
 ### **Ejecución**  
 ```bash
 python simulador_riesgos.py
