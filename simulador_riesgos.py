@@ -1,6 +1,11 @@
 import random
+import os
 from dataclasses import dataclass
 from typing import List, Dict, Tuple
+
+def limpiar_pantalla():
+    """Limpia la pantalla de la consola"""
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 @dataclass
 class Riesgo:
@@ -183,10 +188,13 @@ def main():
     gestor = GestorRiesgos(riesgos)
     reporte = ReporteRiesgos()
     
-    print("=== Simulador de Riesgos en Sprints Scrum ===")
+    
     
     while True:
         # Menú de opciones
+        limpiar_pantalla()
+        print("=== Simulador de Riesgos en Sprints Scrum ===")
+        
         print("\nOpciones:")
         print("1. Simular un sprint")
         print("2. Simular múltiples sprints")
@@ -199,26 +207,38 @@ def main():
         
         # Lógica de manejo de opciones
         if opcion == "1":
+            limpiar_pantalla()
             resultados = gestor.simular_sprint()
             print("\n" + reporte.generar_reporte(resultados))
+            input("\nPresione Enter para continuar...")
+            
         elif opcion == "2":
+            limpiar_pantalla()
             try:
                 num_sprints = int(input("Ingrese el número de sprints a simular: "))
                 resultados = gestor.simular_sprint(num_sprints)
+                limpiar_pantalla()
                 print("\n" + reporte.generar_reporte(resultados))
+                input("\nPresione Enter para continuar...")
             except ValueError:
                 print("Por favor ingrese un número válido.")
+                input("\nPresione Enter para continuar...")
         elif opcion == "3":
+            limpiar_pantalla()
             riesgo = gestor.obtener_riesgo_mas_prioritario()
             mitigacion = MitigacionStrategy.generar_mitigacion(riesgo)
             print("\n" + reporte.generar_reporte_prioritario(riesgo, mitigacion))
+            input("\nPresione Enter para continuar...")
         elif opcion == "4":
+            limpiar_pantalla()
             print("\n=== Todos los riesgos ordenados por prioridad ===")
             for i, riesgo in enumerate(gestor.obtener_todos_riesgos_ordenados(), 1):
                 mitigacion = MitigacionStrategy.generar_mitigacion(riesgo)
                 print(f"{i}. {riesgo.nombre} - Prioridad: {riesgo.prioridad} ({riesgo.nivel_prioridad})")
                 print(f"   Mitigación: {mitigacion}\n")
+            input("\nPresione Enter para continuar...")
         elif opcion == "5":
+            limpiar_pantalla()
             print("\nSeleccione nivel de prioridad:")
             print("1. Baja (1-6)")
             print("2. Media (7-14)")
@@ -229,21 +249,27 @@ def main():
                 riesgos_nivel = gestor.obtener_riesgos_por_nivel("Baja")
                 riesgos_con_mitigacion = [(r, MitigacionStrategy.generar_mitigacion(r)) for r in riesgos_nivel]
                 print("\n" + reporte.generar_reporte_por_nivel(riesgos_con_mitigacion, "Baja"))
+                input("\nPresione Enter para continuar...")
             elif sub_opcion == "2":
                 riesgos_nivel = gestor.obtener_riesgos_por_nivel("Media")
                 riesgos_con_mitigacion = [(r, MitigacionStrategy.generar_mitigacion(r)) for r in riesgos_nivel]
                 print("\n" + reporte.generar_reporte_por_nivel(riesgos_con_mitigacion, "Media"))
+                input("\nPresione Enter para continuar...")
             elif sub_opcion == "3":
                 riesgos_nivel = gestor.obtener_riesgos_por_nivel("Alta")
                 riesgos_con_mitigacion = [(r, MitigacionStrategy.generar_mitigacion(r)) for r in riesgos_nivel]
                 print("\n" + reporte.generar_reporte_por_nivel(riesgos_con_mitigacion, "Alta"))
+                input("\nPresione Enter para continuar...")
             else:
                 print("Opción no válida.")
+                input("\nPresione Enter para continuar...")
+                
         elif opcion == "6":
             print("Saliendo del programa...")
             break
         else:
             print("Opción no válida. Por favor seleccione una opción del 1 al 6.")
+            input("\nPresione Enter para continuar...")
 
 if __name__ == "__main__":
     main()
